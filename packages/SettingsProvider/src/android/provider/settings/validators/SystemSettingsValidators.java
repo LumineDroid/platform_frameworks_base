@@ -292,5 +292,6 @@ public class SystemSettingsValidators {
         VALIDATORS.put(System.ADVANCED_REBOOT, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.SHADE_BLUR_RADIUS, new InclusiveIntegerRangeValidator(5, 80));
         VALIDATORS.put(System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, BOOLEAN_VALIDATOR);
+        VALIDATORS.put(System.HIGH_TOUCH_SENSITIVITY_ENABLE, BOOLEAN_VALIDATOR);
     }
 }
