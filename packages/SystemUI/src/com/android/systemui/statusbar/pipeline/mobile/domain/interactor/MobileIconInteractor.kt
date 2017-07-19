@@ -44,7 +44,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -153,6 +155,8 @@ interface MobileIconInteractor {
 
     /** See [MobileIconsInteractor.isVoWifiForceHidden]. */
     val isVoWifiForceHidden: Flow<Boolean>
+
+    val shouldShowFourgIcon: StateFlow<Boolean>
 }
 
 /** Interactor for a single mobile connection. This connection _should_ have one subscription ID */
@@ -190,7 +194,7 @@ class MobileIconInteractorImpl(
             "system:" + Settings.System.DATA_DISABLED_ICON;
 
     private val shouldShowExclamationMark: StateFlow<Boolean> =
-        conflatedCallbackFlow {
+        callbackFlow {
                 val callback =
                     object : TunerService.Tunable {
                         override fun onTuningChanged(key: String, newValue: String?) {
@@ -204,6 +208,32 @@ class MobileIconInteractorImpl(
 
                 awaitClose { Dependency.get(TunerService::class.java).removeTunable(callback) }
             }
+            .conflate()
+            .stateIn(
+                scope,
+                started = SharingStarted.WhileSubscribed(),
+                true
+            )
+
+    private final val SHOW_FOURG_ICON: String =
+            "system:" + Settings.System.SHOW_FOURG_ICON;
+
+    override val shouldShowFourgIcon: StateFlow<Boolean> =
+        callbackFlow {
+                val callback =
+                    object : TunerService.Tunable {
+                        override fun onTuningChanged(key: String, newValue: String?) {
+                            when (key) {
+                                SHOW_FOURG_ICON -> 
+                                    trySend(TunerService.parseIntegerSwitch(newValue, false))
+                            }
+                        }
+                    }
+                Dependency.get(TunerService::class.java).addTunable(callback, SHOW_FOURG_ICON)
+
+                awaitClose { Dependency.get(TunerService::class.java).removeTunable(callback) }
+            }
+            .conflate()
             .stateIn(
                 scope,
                 started = SharingStarted.WhileSubscribed(),
