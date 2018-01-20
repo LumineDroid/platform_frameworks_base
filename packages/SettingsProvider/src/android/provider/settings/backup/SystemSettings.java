@@ -134,7 +134,8 @@ public class SystemSettings {
                 Settings.System.MIN_REFRESH_RATE,
                 Settings.System.ACCESSIBILITY_FORCE_INVERT_COLOR_OVERRIDE_PACKAGES_TO_DISABLE,
                 Settings.System.STATUS_BAR_SHOW_BATTERY_PERCENT,
-                Settings.System.STATUS_BAR_BATTERY_STYLE
+                Settings.System.STATUS_BAR_BATTERY_STYLE,
+                Settings.System.ADVANCED_REBOOT
         ));
         return settings.toArray(new String[0]);
     }
