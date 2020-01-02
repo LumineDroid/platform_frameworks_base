@@ -291,5 +291,6 @@ public class SystemSettingsValidators {
         VALIDATORS.put(System.STATUS_BAR_BATTERY_STYLE, new InclusiveIntegerRangeValidator(0, 3));
         VALIDATORS.put(System.ADVANCED_REBOOT, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.SHADE_BLUR_RADIUS, new InclusiveIntegerRangeValidator(5, 80));
+        VALIDATORS.put(System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, BOOLEAN_VALIDATOR);
     }
 }
