@@ -14333,6 +14333,12 @@ public final class Settings {
         @Readable
         public static final String PI_SNAPCHAT_SPOOF = "pi_snapchat_spoof";
 
+         /**
+         * Whether to use black theme for dark mode
+         * @hide
+         */
+        public static final String BERRY_BLACK_THEME = "berry_black_theme";
+
         /**
          * Whether to show ambient instead of waking for the tap gesture
          * @hide
