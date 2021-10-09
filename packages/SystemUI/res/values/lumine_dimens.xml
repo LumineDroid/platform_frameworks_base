@@ -12,4 +12,8 @@
 
     <!-- The height of the WiFi toggle layout in Internet panel -->
     <dimen name="internet_dialog_wifi_toggle_height">56dp</dimen>
+
+    <!-- StatusBar burn-in protection -->
+    <dimen name="horizontal_max_shift">4dp</dimen>
+    <dimen name="vertical_max_shift">4dp</dimen>
 </resources>
