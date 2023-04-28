@@ -16,4 +16,8 @@
     <!-- StatusBar burn-in protection -->
     <dimen name="horizontal_max_shift">4dp</dimen>
     <dimen name="vertical_max_shift">4dp</dimen>
+
+    <!-- Weather -->  
+    <dimen name="weather_image_max_size">24dp</dimen>
+    <dimen name="weather_humidity_margin_start">16dp</dimen>
 </resources>
