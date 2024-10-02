@@ -18,6 +18,7 @@ package com.android.systemui.tuner;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -59,7 +60,9 @@ public class TunerActivity extends CollapsingToolbarBaseActivity implements
     }
 
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.tuner_activity);
 
         DynamicColors.applyToActivityIfAvailable(this);
