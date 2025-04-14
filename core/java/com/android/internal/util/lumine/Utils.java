@@ -263,6 +263,15 @@ public class Utils {
         }
     }
 
+    public static void restartSystemUI() {
+        final IStatusBarService mBarService = IStatusBarService.Stub.asInterface(
+                ServiceManager.getService(Context.STATUS_BAR_SERVICE));
+        try {
+            mBarService.restartSystemUI();
+        } catch (RemoteException e) {
+        }
+    }
+
     public static boolean isPackageInstalled(Context context, String pkg) {
         return isPackageInstalled(context, pkg, true);
     }
