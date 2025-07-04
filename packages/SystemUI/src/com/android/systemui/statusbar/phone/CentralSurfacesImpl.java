@@ -74,6 +74,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceControl;
 import android.view.ThreadedRenderer;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
 import android.view.accessibility.AccessibilityManager;
@@ -132,6 +133,7 @@ import com.android.systemui.keyguard.KeyguardViewMediator;
 import com.android.systemui.keyguard.ScreenLifecycle;
 import com.android.systemui.keyguard.WakefulnessLifecycle;
 import com.android.systemui.log.SessionTracker;
+import com.android.systemui.media.MediaViewController;
 import com.android.systemui.media.NotificationMediaManager;
 import com.android.systemui.navigationbar.NavigationBarController;
 import com.android.systemui.navigationbar.views.NavigationBarView;
@@ -417,6 +419,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     private final UserTracker mUserTracker;
     private final TunerService mTunerService;
     private final ActivityStarter mActivityStarter;
+    private final MediaViewController mMediaViewController;
 
     private final DisplayMetrics mDisplayMetrics;
 
@@ -628,6 +631,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
             WindowManager windowManager,
             WindowManagerProvider windowManagerProvider,
             SessionTracker sessionTracker
+            MediaViewController mediaViewController
     ) {
         mContext = context;
         mNotificationsController = notificationsController;
@@ -750,6 +754,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         mWindowManager = windowManager;
         mWindowManagerProvider = windowManagerProvider;
         mSessionTracker = sessionTracker;
+        mMediaViewController = mediaViewController;
     }
 
     private void initBubbles(Bubbles bubbles) {
@@ -892,6 +897,13 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                 (requestTopUi, componentTag) -> mMainExecutor.execute(
                         () -> mTopUiController.setRequestTopUi(requestTopUi, componentTag)
                 )));
+        getNotifContainerParentView().addView(mMediaViewController.getMediaArtScrim(), 0);
+    }
+
+    private ViewGroup getNotifContainerParentView() {
+        ViewGroup rootView = (ViewGroup) getNotificationShadeWindowView().findViewById(R.id.scrim_behind).getParent();
+        ViewGroup targetView = rootView.findViewById(R.id.notification_container_parent);
+        return targetView;
     }
 
     @VisibleForTesting
