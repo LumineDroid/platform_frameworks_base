@@ -54,6 +54,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -956,7 +957,10 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
     }
 
     private boolean rebootAction(boolean safeMode, String reason) {
-        if (mKeyguardStateController.isMethodSecure() && mKeyguardStateController.isShowing()) {
+        final int userId = Binder.getCallingUserHandle().getIdentifier();
+        final boolean powerOffVerify = mSecureSettings.getIntForUser("power_off_verify", 0,
+                userId) != 0;
+        if (mKeyguardStateController.isMethodSecure() && mKeyguardStateController.isShowing() && powerOffVerify) {
             mActivityStarter.postQSRunnableDismissingKeyguard(() -> {
                 mWindowManagerFuncs.reboot(safeMode, reason);
             });
