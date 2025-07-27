@@ -7222,6 +7222,12 @@ public final class Settings {
         public static final String QS_SHOW_DATA_USAGE_WINDOW = "qs_show_data_usage_window";
 
         /**
+         * Customizable notification shade blur radius (in dp).
+         * @hide
+         */
+        public static final String SHADE_BLUR_RADIUS = "shade_blur_radius";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
