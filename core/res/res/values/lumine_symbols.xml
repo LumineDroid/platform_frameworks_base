@@ -100,4 +100,8 @@
     <!-- Pocket Service -->
     <java-symbol type="string" name="config_pocketJudgeVendorSensorName" />
     <java-symbol type="string" name="config_pocketJudgeVendorProximitySensorName" />
+
+    <!-- Blur radius used by SystemUI -->
+    <java-symbol type="dimen" name="min_window_blur_radius" />
+    <java-symbol type="dimen" name="max_window_blur_radius" />
 </resources>
