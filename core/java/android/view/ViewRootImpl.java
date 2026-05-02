@@ -3355,6 +3355,10 @@ public final class ViewRootImpl implements ViewParent,
             mTraversalScheduled = false;
             removeTraversalBarrier();
             performTraversals(frameTimeNanos);
+            if (mFirstFrameDrawn) {
+                ViewCacheManager.getInstance().onTraversalEnd(this);
+                mFirstFrameDrawn = false;
+            }
         }
     }
 
