@@ -380,6 +380,23 @@ object KeyguardRootViewBinder {
                 override fun onChildViewAdded(parent: View, child: View) {
                     childViews.put(child.id, child)
                     onViewAdded(child.id, child)
+                    val movement = viewModel.currentMovement
+                    with(movement) {
+                        when (child.id) {
+                            burnInLayerId, aodPromotedNotificationId,
+                            aodNotificationIconContainerId, sliceViewId,
+                            largeClockId -> {
+                                child.translationY = translationY.toFloat()
+                                if (scaleClockOnly) {
+                                    child.scaleX = scale
+                                    child.scaleY = scale
+                                }
+                            }
+                            largeClockDateId -> {
+                                child.translationY = translationY.toFloat()
+                            }
+                        }
+                    }
                 }
 
                 override fun onChildViewRemoved(parent: View, child: View) {
