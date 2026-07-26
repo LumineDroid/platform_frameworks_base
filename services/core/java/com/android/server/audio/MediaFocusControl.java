@@ -683,7 +683,7 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
                 }
             } else {
                 for (FocusRequester multifr : mMultiAudioFocusList) {
-                    if (isLockedFocusOwner(multifr)) {
+                    if (isLockedFocusOwner(multifr) || mFocusStack.empty()) {
                         multifr.handleFocusGain(AudioManager.AUDIOFOCUS_GAIN);
                     }
                 }
@@ -1461,6 +1461,10 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
         // directly, but just in case)
         if (isForCall) {
             flags |= AudioManager.AUDIOFOCUS_FLAG_LOCK;
+        }
+
+        if (mMultiAudioFocusEnabled) {
+            return AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         }
 
         new MediaMetrics.Item(mMetricsId)
