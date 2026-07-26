@@ -106,6 +106,7 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
     private Context mContext;
     private final @NonNull PlayerFocusEnforcer mFocusEnforcer;
     private boolean mMultiAudioFocusEnabled = false;
+    private boolean mMultiAudioFocusEnabledDefault = false;
 
     private final ContentObserver mMultiAudioFocusObserver = new ContentObserver(
             new Handler(Looper.getMainLooper())) {
@@ -114,7 +115,8 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
             if (mContext == null) return;
             final ContentResolver cr = mContext.getContentResolver();
             mMultiAudioFocusEnabled = Settings.System.getIntForUser(cr,
-                    Settings.System.MULTI_AUDIO_FOCUS_ENABLED, 0, cr.getUserId()) != 0;
+                    Settings.System.MULTI_AUDIO_FOCUS_ENABLED,
+                    mMultiAudioFocusEnabledDefault ? 1 : 0, cr.getUserId()) != 0;
             Log.i(TAG, "Multi audio focus " + (mMultiAudioFocusEnabled ? "enabled" : "disabled"));
         }
     };
@@ -131,13 +133,17 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
         mContext = cntxt;
         mFocusEnforcer = pfe;
 
-        mMultiAudioFocusEnabled = isMultiFocus;
         if (mContext != null) {
+            mMultiAudioFocusEnabledDefault = audioFocusDesktop()
+                    && mContext.getResources().getBoolean(
+                            com.android.internal.R.bool.config_multi_audio_focus_enabled_default);
             ContentResolver cr = mContext.getContentResolver();
             cr.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.MULTI_AUDIO_FOCUS_ENABLED),
                     false, mMultiAudioFocusObserver, UserHandle.USER_ALL);
         }
+
+        mMultiAudioFocusEnabled = isMultiFocus;
         initFocusThreading();
     }
 
