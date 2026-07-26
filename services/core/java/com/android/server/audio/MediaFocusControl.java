@@ -37,11 +37,17 @@ import android.media.audiopolicy.AudioPolicy;
 import android.media.audiopolicy.IAudioPolicyCallback;
 import android.os.Binder;
 import android.os.Build;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.ContentObserver;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.android.internal.annotations.GuardedBy;
@@ -97,18 +103,46 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
      */
     static final boolean ENFORCE_FADEOUT_FOR_FOCUS_LOSS = true;
 
+    private Context mContext;
     private final @NonNull PlayerFocusEnforcer mFocusEnforcer;
     private boolean mMultiAudioFocusEnabled = false;
+
+    private final ContentObserver mMultiAudioFocusObserver = new ContentObserver(
+            new Handler(Looper.getMainLooper())) {
+        @Override
+        public void onChange(boolean selfChange) {
+            if (mContext == null) return;
+            final ContentResolver cr = mContext.getContentResolver();
+            mMultiAudioFocusEnabled = Settings.System.getIntForUser(cr,
+                    Settings.System.MULTI_AUDIO_FOCUS_ENABLED, 0, cr.getUserId()) != 0;
+            Log.i(TAG, "Multi audio focus " + (mMultiAudioFocusEnabled ? "enabled" : "disabled"));
+        }
+    };
+
+    boolean isMultiAudioFocusEnabled() {
+        return mMultiAudioFocusEnabled;
+    }
 
     private final Object mExtFocusChangeLock = new Object();
     @GuardedBy("mExtFocusChangeLock")
     private long mExtFocusChangeCounter;
 
-    protected MediaFocusControl(PlayerFocusEnforcer pfe, boolean isMultiFocus) {
+    protected MediaFocusControl(Context cntxt, PlayerFocusEnforcer pfe, boolean isMultiFocus) {
+        mContext = cntxt;
         mFocusEnforcer = pfe;
 
         mMultiAudioFocusEnabled = isMultiFocus;
+        if (mContext != null) {
+            ContentResolver cr = mContext.getContentResolver();
+            cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.MULTI_AUDIO_FOCUS_ENABLED),
+                    false, mMultiAudioFocusObserver, UserHandle.USER_ALL);
+        }
         initFocusThreading();
+    }
+
+    protected MediaFocusControl(PlayerFocusEnforcer pfe, boolean isMultiFocus) {
+        this(null, pfe, isMultiFocus);
     }
 
     protected void dump(PrintWriter pw) {

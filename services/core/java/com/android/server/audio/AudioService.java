@@ -1799,7 +1799,7 @@ public class AudioService extends IAudioService.Stub
 
         mPlaybackMonitor.registerPlaybackCallback(mPlaybackActivityMonitor, true);
 
-        mMediaFocusControl = new MediaFocusControl(mPlaybackMonitor, isMultiFocus());
+        mMediaFocusControl = new MediaFocusControl(mContext, mPlaybackMonitor, isMultiFocus());
 
         readAndSetLowRamDevice();
 
@@ -13074,7 +13074,7 @@ public class AudioService extends IAudioService.Stub
                 Log.w(TAG, "Audio focus environment already exists for token: " + focusEnvToken);
                 return false;
             }
-            MediaFocusControl mfc = new MediaFocusControl(mPlaybackMonitor, isMultiFocus());
+            MediaFocusControl mfc = new MediaFocusControl(mContext, mPlaybackMonitor, isMultiFocus());
             mFocusEnvironmentsMap.put(focusEnvToken, mfc);
             try {
                 focusEnvToken.linkToDeath(mFocusEnvironmentDeathRecipient, 0);
