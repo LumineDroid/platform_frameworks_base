@@ -213,8 +213,8 @@ public final class PixelPropsUtils {
         propsToChangeRecentPixel.put("PRODUCT", "mustang");
         propsToChangeRecentPixel.put("HARDWARE", "mustang");
         propsToChangeRecentPixel.put("MODEL", "Pixel 10 Pro XL");
-        propsToChangeRecentPixel.put("ID", "CP1A.260405.005");
-        propsToChangeRecentPixel.put("FINGERPRINT", "google/mustang/mustang:16/CP1A.260405.005/15001963:user/release-keys");
+        propsToChangeRecentPixel.put("ID", "CP2A.260805.005");
+        propsToChangeRecentPixel.put("FINGERPRINT", "google/mustang/mustang:17/CP2A.260805.005/15828068:user/release-keys");
         propsToChangePixelTablet = new HashMap<>();
         propsToChangePixelTablet.put("BRAND", "google");
         propsToChangePixelTablet.put("BOARD", "tangorpro");
