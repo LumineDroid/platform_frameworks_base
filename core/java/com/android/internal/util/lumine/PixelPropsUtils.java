@@ -52,6 +52,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+import sun.misc.Unsafe;
+
 /**
  * @hide
  */
@@ -88,6 +90,9 @@ public final class PixelPropsUtils {
 
     private static volatile Set<String> mLauncherPkgs;
     private static volatile Set<String> mExemptedUidPkgs;
+
+    private static final Field OFFSET_FIELD;
+    private static final Unsafe UNSAFE;
 
     // Tensor devices: Pixel 6 and above
     private static final Pattern TENSOR_PIXEL_PATTERN =
@@ -171,6 +176,23 @@ public final class PixelPropsUtils {
             }
         }
         return false;
+    }
+
+    static {
+        Unsafe unsafe = null;
+        Field offsetField = null;
+        try {
+            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            unsafe = (Unsafe) theUnsafe.get(null);
+
+            offsetField = Field.class.getDeclaredField("offset");
+            offsetField.setAccessible(true);
+        } catch (Exception e) {
+            Log.e(TAG, "Unable to initialize Unsafe", e);
+        }
+        UNSAFE = unsafe;
+        OFFSET_FIELD = offsetField;
     }
 
     public static boolean isCustomForkBuild() {
@@ -354,32 +376,43 @@ public final class PixelPropsUtils {
     }
 
     public static void setPropValue(String key, Object value) {
+        if (UNSAFE == null || OFFSET_FIELD == null) {
+            Log.e(TAG, "Unsafe is unavailable, cannot set prop " + key);
+            return;
+        }
+        Field field = null;
         try {
-            Field field = getBuildClassField(key);
-            if (field != null) {
-                field.setAccessible(true);
-                if (field.getType() == int.class) {
-                    if (value instanceof String) {
-                        field.set(null, Integer.parseInt((String) value));
-                    } else if (value instanceof Integer) {
-                        field.set(null, (Integer) value);
-                    }
-                } else if (field.getType() == long.class) {
-                    if (value instanceof String) {
-                        field.set(null, Long.parseLong((String) value));
-                    } else if (value instanceof Long) {
-                        field.set(null, (Long) value);
-                    }
-                } else {
-                    field.set(null, value.toString());
-                }
-                field.setAccessible(false);
-                dlog("Set prop " + key + " to " + value);
-            } else {
+            field = getBuildClassField(key);
+            if (field == null) {
                 Log.e(TAG, "Field " + key + " not found in Build or Build.VERSION classes");
+                return;
             }
-        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+            field.setAccessible(true);
+            long offset = OFFSET_FIELD.getInt(field);
+            Object base = field.getDeclaringClass();
+
+            if (field.getType() == int.class) {
+                int intValue = (value instanceof String)
+                        ? Integer.parseInt((String) value)
+                        : (Integer) value;
+                UNSAFE.putInt(base, offset, intValue);
+            } else if (field.getType() == long.class) {
+                long longValue = (value instanceof String)
+                        ? Long.parseLong((String) value)
+                        : (Long) value;
+                UNSAFE.putLong(base, offset, longValue);
+            } else {
+                UNSAFE.putObject(base, offset, value.toString());
+            }
+            dlog("Set prop " + key + " to " + value);
+        } catch (Exception e) {
             Log.e(TAG, "Failed to set prop " + key, e);
+        } finally {
+            if (field != null) {
+                try {
+                    field.setAccessible(false);
+                } catch (Exception ignored) {}
+            }
         }
     }
 
